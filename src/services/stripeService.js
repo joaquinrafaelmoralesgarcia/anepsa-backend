@@ -33,8 +33,8 @@ async function createPaymentLink(orden) {
       metadata: { ordenId: orden._id.toString() },
     },
     metadata: { ordenId: orden._id.toString() },
-    success_url: 'https://anepsa.example.com/pago-exitoso',
-    cancel_url: 'https://anepsa.example.com/pago-cancelado',
+    success_url: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/pago-exitoso',
+    cancel_url: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/pago-cancelado',
   });
 
   return { url: session.url, id: session.id };
