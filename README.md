@@ -1,5 +1,7 @@
 # anepsa-backend
 
+[![CI](https://github.com/joaquinrafaelmoralesgarcia/anepsa-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/joaquinrafaelmoralesgarcia/anepsa-backend/actions/workflows/ci.yml)
+
 API REST para el sistema de gestión de órdenes de avalúo de ANEPSA.
 
 **Stack:** Node.js · Express · MongoDB (Mongoose) · JWT · Stripe · Socket.io · Jest · Docker

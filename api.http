@@ -1,0 +1,227 @@
+# ANEPSA API — Colección de endpoints
+# Usar con extensión REST Client de VS Code o similar
+# Variables: reemplaza {{token}} con el accessToken obtenido en login
+
+@base = http://localhost:3000/api
+@token = TU_ACCESS_TOKEN_AQUI
+
+### ============================================================
+### AUTH
+### ============================================================
+
+### Crear primer admin (sin token)
+POST {{base}}/auth/register-first
+Content-Type: application/json
+
+{
+  "nombre": "Admin ANEPSA",
+  "email": "admin@anepsa.com",
+  "password": "Admin1234!",
+  "rol": "admin"
+}
+
+### Login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@anepsa.com",
+  "password": "Admin1234!"
+}
+
+### Refresh token
+POST {{base}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "TU_REFRESH_TOKEN"
+}
+
+### Logout
+POST {{base}}/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "TU_REFRESH_TOKEN"
+}
+
+### ============================================================
+### CLIENTES
+### ============================================================
+
+### Listar clientes
+GET {{base}}/clientes
+Authorization: Bearer {{token}}
+
+### Obtener cliente por ID
+GET {{base}}/clientes/CLIENTE_ID
+Authorization: Bearer {{token}}
+
+### Crear cliente (admin)
+POST {{base}}/clientes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Empresa Ejemplo SA de CV",
+  "RFC": "EEJ800101AAA",
+  "email": "contacto@empresa.com",
+  "telefono": "5551234567",
+  "direccion": "Av. Insurgentes Sur 100, CDMX"
+}
+
+### Actualizar cliente (admin)
+PUT {{base}}/clientes/CLIENTE_ID
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "telefono": "5559876543"
+}
+
+### Eliminar cliente (admin)
+DELETE {{base}}/clientes/CLIENTE_ID
+Authorization: Bearer {{token}}
+
+### ============================================================
+### INMUEBLES
+### ============================================================
+
+### Listar inmuebles
+GET {{base}}/inmuebles
+Authorization: Bearer {{token}}
+
+### Obtener inmueble por ID
+GET {{base}}/inmuebles/INMUEBLE_ID
+Authorization: Bearer {{token}}
+
+### Crear inmueble (admin)
+POST {{base}}/inmuebles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "direccion": "Calle Reforma 200, Guadalajara",
+  "tipo": "casa",
+  "metrosCuadrados": 150,
+  "cliente": "CLIENTE_ID"
+}
+
+### Actualizar inmueble (admin)
+PUT {{base}}/inmuebles/INMUEBLE_ID
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "metrosCuadrados": 180
+}
+
+### Eliminar inmueble (admin)
+DELETE {{base}}/inmuebles/INMUEBLE_ID
+Authorization: Bearer {{token}}
+
+### ============================================================
+### ÓRDENES DE SERVICIO
+### ============================================================
+
+### Listar órdenes (admin ve todas, valuador solo las suyas)
+GET {{base}}/ordenes
+Authorization: Bearer {{token}}
+
+### Obtener orden por ID
+GET {{base}}/ordenes/ORDEN_ID
+Authorization: Bearer {{token}}
+
+### Crear orden (admin) — genera anticipoUrl vía Stripe
+POST {{base}}/ordenes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "inmueble": "INMUEBLE_ID",
+  "monto": 116000
+}
+
+### Actualizar orden — asignar valuador y cambiar estatus (admin)
+PUT {{base}}/ordenes/ORDEN_ID
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "valuadorAsignado": "USUARIO_ID",
+  "estatus": "en proceso"
+}
+
+### Cancelar orden (solo admin)
+PUT {{base}}/ordenes/ORDEN_ID
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estatus": "cancelada"
+}
+
+### Eliminar orden (admin)
+DELETE {{base}}/ordenes/ORDEN_ID
+Authorization: Bearer {{token}}
+
+### ============================================================
+### USUARIOS
+### ============================================================
+
+### Listar usuarios (admin)
+GET {{base}}/usuarios
+Authorization: Bearer {{token}}
+
+### Obtener usuario por ID (admin)
+GET {{base}}/usuarios/USUARIO_ID
+Authorization: Bearer {{token}}
+
+### Crear usuario valuador (admin)
+POST {{base}}/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Juan Valuador",
+  "email": "valuador@anepsa.com",
+  "password": "Valuador1234!",
+  "rol": "valuador"
+}
+
+### Actualizar usuario (admin)
+PUT {{base}}/usuarios/USUARIO_ID
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Juan Pérez Actualizado"
+}
+
+### Desactivar usuario / baja lógica (admin)
+DELETE {{base}}/usuarios/USUARIO_ID
+Authorization: Bearer {{token}}
+
+### ============================================================
+### WEBHOOK STRIPE
+### ============================================================
+
+### Simular webhook de Stripe (en producción viene de Stripe CLI)
+### stripe trigger payment_intent.succeeded
+POST http://localhost:3000/api/webhooks/stripe
+Content-Type: application/json
+stripe-signature: t=1234567890,v1=fake_signature
+
+{
+  "id": "evt_test_001",
+  "type": "payment_intent.succeeded",
+  "data": {
+    "object": {
+      "id": "pi_test_001",
+      "metadata": { "ordenId": "ORDEN_ID" }
+    }
+  }
+}
+
+### Health check
+GET http://localhost:3000/health

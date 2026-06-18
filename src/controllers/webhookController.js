@@ -26,9 +26,9 @@ async function handleStripeWebhook(req, res) {
     return success(res, { message: 'Evento ya procesado' });
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    const ordenId = session.metadata?.ordenId;
+  if (event.type === 'payment_intent.succeeded' || event.type === 'checkout.session.completed') {
+    const obj = event.data.object;
+    const ordenId = obj.metadata?.ordenId;
 
     if (ordenId) {
       const orden = await Orden.findByIdAndUpdate(
